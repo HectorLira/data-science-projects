@@ -1,2 +1,2 @@
-# machine-learning-projects
+# Machine Learning Projects
 Repository containing machine learning projects.
