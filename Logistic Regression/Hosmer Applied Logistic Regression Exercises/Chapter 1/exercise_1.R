@@ -15,7 +15,7 @@ ggplot(data = icu_data) +
 
 intervals <- 15 + 10 * 0:8
 class_rep <- rowMeans(cbind(head(intervals, -1),
-                            intervals[-1] -1))
+                            intervals[-1] - 1))
 
 icu_data_summary <- icu_data %>%
   mutate(age_intervals = cut(AGE, breaks = intervals,
