@@ -2,7 +2,7 @@ library(ggplot2)
 library(data.table)
 library(dplyr)
 
-setwd("~/Desktop/machine-learning-projects/Logistic Regression/Hosmer Applied Logistic Regression Exercises/Chapter 1")
+setwd("~/Desktop/machine-learning-projects/Logistic Regression/Hosmer Applied Logistic Regression Exercises")
 
 icu_data <- fread("datasets/ICU/ICU.txt", header = T)
 
@@ -128,4 +128,61 @@ st_statistic
 
 2 * (1 - pnorm(st_statistic))
 
+## Deviance
+-2 * log(logistic_likelihood(icu_data$STA, predictions))
+
+logistic_model$deviance
+
 # g)
+alpha <- 0.05
+se_b1 <- coef(summary(logistic_model))[2, 2]
+
+logistic_model$coefficients[2] +
+  c(lower = -qnorm(1-alpha/2)*se_b1,
+    upper = qnorm(1-alpha/2)*se_b1)
+
+confint.default(logistic_model,
+                parm = 2,
+                level = 1 - alpha)
+
+# h)
+summary(logistic_model)$cov.scaled
+
+## logit prediction
+x <- 60
+
+sum(logistic_model$coefficients * c(1, x))
+predict(logistic_model,
+        newdata = data.frame(AGE = x),
+        type = 'link')
+
+## logistic probability prediction
+logit_prediction <- sum(logistic_model$coefficients * c(1, x))
+exp(logit_prediction) / (1 + exp(logit_prediction))
+predict(logistic_model,
+        newdata = data.frame(AGE = x),
+        type = 'response')
+
+## confidence intervals
+### logit prediction confidence intervals
+alpha <- 0.05
+
+var_g <- summary(logistic_model)$cov.scaled[1,1] +
+  (x^2) * summary(logistic_model)$cov.scaled[2,2] +
+  2 * x * summary(logistic_model)$cov.scaled[2, 1]
+se_g <- sqrt(var_g)
+
+g <- predict(logistic_model,
+             newdata = data.frame(AGE = x),
+             type = 'link')
+
+g + c(lower = -qnorm(1 - alpha/2) * se_g,
+      g = 0,
+      upper = qnorm(1 - alpha/2) * se_g)
+
+### logistic probability confidence intervals
+g_intervals <- g + c(lower = -qnorm(1 - alpha/2) * se_g,
+                     g = 0,
+                     upper = qnorm(1 - alpha/2) * se_g)
+
+exp(g_intervals) / (1 + exp(g_intervals))
