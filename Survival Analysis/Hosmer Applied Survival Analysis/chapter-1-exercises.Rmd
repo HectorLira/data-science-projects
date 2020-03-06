@@ -1,0 +1,80 @@
+---
+title: "Chapter 1 - Exercises"
+author: "Héctor Lira Talancón"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Package Installation
+
+```{r libraries, message = F}
+library(tidyr)
+library(dplyr)
+library(lubridate)
+library(data.table)
+library(ggplot2)
+library(survival)
+```
+
+## Reading the Data
+
+```{r read_data}
+whas100 <- fread("Second-Edition Data/whas100.dat",
+                 col.names=c("id", "admitdate", "foldate", "los", "lenfol", "fstat", "age", "gender", "bmi")) %>%
+  mutate(admitdate=as.Date(admitdate, format='%m/%d/%Y'),
+         foldate=as.Date(foldate, format='%m/%d/%Y'),
+         fstat=as.factor(fstat)) %>%
+  as_tibble
+```
+
+## Exercise 1
+
+```{r scatter_plot_1}
+ggplot(data=whas100) +
+  geom_point(aes(y=foldate, x=age, shape=fstat)) +
+  ggtitle("Follow-up time vs. age")
+```
+
+### 1.a
+Differences from a normal scatter plot in a linear regression setting:
+
+- there are points in the scatter plot that "stop" at the last follow-up date (left censored).
+- there are three dimensions in this scatter plot relevant to our regression problem (follow-up date, age, and vital status).
+
+### 1.b
+We'll draw a line using local averages.
+
+```{r average_foldate}
+cuts <- pretty(whas100$age)
+class_reps <- frollmean(cuts, n=2)[-1]
+
+foldate_by_age_group <- whas100 %>%
+  mutate(age_group=cut(age,
+                       breaks=cuts,
+                       include.lowest=T,
+                       right=F)) %>%
+  group_by(age_group) %>%
+  summarise(mean_foldate=mean(foldate)) %>%
+  mutate(class_reps=class_reps)
+
+ggplot() +
+  geom_point(data=whas100, aes(y=foldate, x=age, shape=fstat)) +
+  geom_line(data=foldate_by_age_group, aes(y=mean_foldate, x=class_reps), color="blue") +
+  ggtitle("Follow-up time vs. age with regression line")
+```
+
+### 1.c
+It is not a straight line. We could use a step function to represent this regression line.
+
+### 1.d
+It is. R has a packages called `survival` to fit models like this.
+
+## Exercise 2
+Follow-up dates may be left censored.
+
+### Exercise 3
+
+
