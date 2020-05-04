@@ -41,7 +41,7 @@ ggplot(data=whas100) +
 ### 1.a
 Differences from a normal scatter plot in a linear regression setting:
 
-- there are points in the scatter plot that "stop" at the last follow-up date (left censored).
+- there are points in the scatter plot that "stop" at the last follow-up date (right censored).
 - there are three dimensions in this scatter plot relevant to our regression problem (follow-up date, age, and vital status).
 
 ### 1.b
@@ -70,11 +70,21 @@ ggplot() +
 It is not a straight line. We could use a step function to represent this regression line.
 
 ### 1.d
-It is. R has a packages called `survival` to fit models like this.
+It is. R has a packages called `survival` to fit models like these.
 
 ## Exercise 2
-Follow-up dates may be left censored.
+Follow-up dates may be right censored.
 
 ### Exercise 3
+Event: drop-out of the study.
+
+Right censored observations include:
+- 
+- patients that could not be contacted anymore (e.g. they moved cities)
+
+Left censored observations include:
+- 
+
+
 
 

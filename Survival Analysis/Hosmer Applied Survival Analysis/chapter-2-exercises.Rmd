@@ -1,0 +1,71 @@
+---
+title: "Chapter 2 - Exercises"
+author: "Héctor Lira Talancón"
+date: "4/4/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Chapter Summary
+
+Descriptive methods in survival data:
+
+## 1. Kaplan-Meier Curves
+
+$$\hat{S}(t)=\prod\limits_{t_{(1)} \leq t} \frac{n_i - d_i}{n_i}$$
+
+with $\hat{S}(t)=1$ if $t < t_{(1)}$
+
+## 2. Life-Table Estimator (for grouped-data)
+
+- Group data as in a histogram-like fashion
+- Use Kaplan-Meier curves as before
+- Modify the risk set size by (# censored / 2)
+
+$$\big(n - (c/2) - d\big) / \big(n - (c/2)\big)$$
+
+Things to consider:
+
+- The number of subjects being followed affects the magnitude of the descends.
+- Point estimates, confidence intervals, and estimates of key quantiles are needed to asses the precision of our survival curves.
+
+## 3. Variance of the Kaplan-Meier Curve (delta method):
+
+
+- For Kaplan-Meier, we use the delta method (uses first-order Taylor series expansions) to estimate the variance (it is easier to estimate the log-variance because it is easier to estimate the variance of a sum than of a product).
+- The log of the KM estimator is:
+
+$$\ln{\hat{S}(t)} = \sum\limits_{t_{(1)} \leq t}\ln \frac{n_i - d_i}{n_i} = \sum\limits_{t_{(1)} \leq t}\ln \hat{p}_i$$
+
+
+- If we consider the observations at time $t_i$ to be independent Bernoulli random variables (with constant probability), then, each $\hat{p}_i$ is an estimator of this probability. The variance of this estimated probability is $p_i(1-p_i) / n_i$.
+- Using the delta method (calculate the variance of $\exp{X}$ with $X=\ln{\hat{S}(t)}$), we retrieve the estimator of $\text{Var}[\hat{S}(t)]$:
+
+$$\hat{\text{Var}}[\hat{S}(t)] = \big[\hat{S}(t)\big]^2 \sum\limits_{t_{(1)}\leq t} \frac{d_i}{n_i(n_i-d_1)}$$
+
+## 4. Confidence Interval Estimates
+
+- It has been proven that the Kaplan-Meier estimates and functions of it are asymptotically normal.
+- However, using the normal distribution quantiles may lead to negative values.
+- In addition, the assumption of normality may not hold for small samples.
+- Kalbfleisch and Prentice suggest that confidence interval estimation should be based on the _log-log_ survival function, $\ln\{-\ln \hat{S}(t)\}$, which has a range of $(-\infty, \infty)$.
+- The estimator of the variance is obtained using one more time the delta method:
+
+$$\hat{\text{Var}}\Big[\ln\{-\ln \hat{S}(t)\}\Big] = \frac{1}{\big[\ln \hat{S}(t)\big]^2} \sum\limits_{t_{(1)}\leq t} \frac{d_i}{n_i(n_i-d_1)}$$
+- The endpoints of a $100(1-\alpha)\%$ confidence interval is given by:
+
+$$\ln\{-\ln \hat{S}(t)\} \pm z_{1-\alpha/2} \hat{\text{SE}}\big[\ln\{-\ln \hat{S}(t)\}\big]$$
+where $z_{1-\alpha/2}$ is the $\alpha/2$ percentile of a standard normal distribution and $\hat{\text{SE}}(\cdot)$ is the estimated standard error of $(\cdot)$, in this case, the estimated variance of the _log-log_ survival function.
+
+- If we let $\hat{c}_l$ and $\hat{c}_u$ denote the lower and upper limits of the interval mentioned above, it follows that the condfidence interval for the survival function is given by:
+
+$$\big(\exp\big[-\exp(\hat{c}_u)\big], \exp\big[-\exp(\hat{c}_l)\big]\big)$$
+
+Note how the endpoints are inverted.
+
+- It has been observed that this estimation performs well with sample sizes as small as 25 observations and with up to $50\%$ right-censored observations.
+- Other confidence interval estimations include different transformations: (already studied) log transformation, $\ln\hat{S}(t)$, the logit transformation, $\ln{\hat{S}(t) / \big[1-\hat{S}(t)\big]}$, and the arcsine transformation, $\arcsin \sqrt{\hat{S}(t)}$.
+
