@@ -392,7 +392,7 @@ summary {
 </ul>
 </div>
 <div id="variance-of-the-kaplan-meier-curve-delta-method" class="section level2">
-<h2>3. Variance of the Kaplan-Meier curve (delta method):</h2>
+<h2>3. Variance of the Kaplan-Meier Curve (delta method):</h2>
 <ul>
 <li>For Kaplan-Meier, we use the delta method (uses first-order Taylor series expansions) to estimate the variance (it is easier to estimate the log-variance because it is easier to estimate the variance of a sum than of a product).</li>
 <li>The log of the KM estimator is:</li>
@@ -402,7 +402,7 @@ summary {
 <li>If we consider the observations at time <span class="math inline">\(t_i\)</span> to be independent Bernoulli random variables (with constant probability), then, each <span class="math inline">\(\hat{p}_i\)</span> is an estimator of this probability. The variance of this estimated probability is <span class="math inline">\(p_i(1-p_i) / n_i\)</span>.</li>
 <li>Using the delta method (calculate the variance of <span class="math inline">\(\exp{X}\)</span> with <span class="math inline">\(X=\ln{\hat{S}(t)}\)</span>), we retrieve the estimator of <span class="math inline">\(\text{Var}[\hat{S}(t)]\)</span>:</li>
 </ul>
-<p><span class="math display">\[\hat{\text{Var}}[\hat{S}(t)] = \big[\hat{S}(t)\big]^2 \sum\limits_{t_{(1)} \leq t}\]</span></p>
+<p><span class="math display">\[\hat{\text{Var}}[\hat{S}(t)] = \big[\hat{S}(t)\big]^2 \sum\limits_{t_{(1)}\leq t} \frac{d_i}{n_i(n_i-d_1)}\]</span></p>
 </div>
 <div id="confidence-interval-estimates" class="section level2">
 <h2>4. Confidence Interval Estimates</h2>
@@ -410,8 +410,48 @@ summary {
 <li>It has been proven that the Kaplan-Meier estimates and functions of it are asymptotically normal.</li>
 <li>However, using the normal distribution quantiles may lead to negative values.</li>
 <li>In addition, the assumption of normality may not hold for small samples.</li>
-<li>Kalbfleisch and Prentice suggest that confidence interval estimation should be based on the <em>log-log survival</em> function.</li>
+<li>Kalbfleisch and Prentice suggest that confidence interval estimation should be based on the <em>log-log</em> survival function, <span class="math inline">\(\ln\{-\ln \hat{S}(t)\}\)</span>, which has a range of <span class="math inline">\((-\infty, \infty)\)</span>.</li>
+<li>The estimator of the variance is obtained using one more time the delta method:</li>
 </ul>
+<p><span class="math display">\[\hat{\text{Var}}\Big[\ln\{-\ln \hat{S}(t)\}\Big] = \frac{1}{\big[\ln \hat{S}(t)\big]^2} \sum\limits_{t_{(1)}\leq t} \frac{d_i}{n_i(n_i-d_1)}\]</span> - The endpoints of a <span class="math inline">\(100(1-\alpha)\%\)</span> confidence interval is given by:</p>
+<p><span class="math display">\[\ln\{-\ln \hat{S}(t)\} \pm z_{1-\alpha/2} \hat{\text{SE}}\big[\ln\{-\ln \hat{S}(t)\}\big]\]</span> where <span class="math inline">\(z_{1-\alpha/2}\)</span> is the <span class="math inline">\(\alpha/2\)</span> percentile of a standard normal distribution and <span class="math inline">\(\hat{\text{SE}}(\cdot)\)</span> is the estimated standard error of <span class="math inline">\((\cdot)\)</span>, in this case, the estimated variance of the <em>log-log</em> survival function.</p>
+<ul>
+<li>If we let <span class="math inline">\(\hat{c}_l\)</span> and <span class="math inline">\(\hat{c}_u\)</span> denote the lower and upper limits of the interval mentioned above, it follows that the confidence interval for the survival function is given by:</li>
+</ul>
+<p><span class="math display">\[\big(\exp\big[-\exp(\hat{c}_u)\big], \exp\big[-\exp(\hat{c}_l)\big]\big)\]</span></p>
+<p>Note how the endpoints are inverted.</p>
+<ul>
+<li>It has been observed that this estimation performs well with sample sizes as small as 25 observations and with up to <span class="math inline">\(50\%\)</span> right-censored observations.</li>
+<li>Other confidence interval estimations include different transformations: (already studied) log transformation, <span class="math inline">\(\ln\hat{S}(t)\)</span>, the logit transformation, <span class="math inline">\(\ln{\hat{S}(t) / \big[1-\hat{S}(t)\big]}\)</span>, and the arcsine transformation, <span class="math inline">\(\arcsin \sqrt{\hat{S}(t)}\)</span>.</li>
+<li>There is little practical differences from using a different transformation, except that the the arcsine transformation gets wider faster than the other ones for small size samples.</li>
+</ul>
+<div id="confidence-interval-bands" class="section level3">
+<h3>Confidence Interval Bands</h3>
+<ul>
+<li>Using the confidence interval estimations we can compute confidence interval bands.</li>
+<li>However, the probability that all of the confidence intervals contain their respective parameter is much less than <span class="math inline">\((1-\alpha/2)\)</span>.</li>
+<li>Hall and Wellner suggest the following formula to compute interval bands for the interval <span class="math inline">\((0, t_{(m)})\)</span> where <span class="math inline">\(t_{(m)}\)</span> is the largest non-censored value of time:</li>
+</ul>
+<p><span class="math display">\[\ln\big[-\ln\hat{S}(t)\big] \pm H_{\hat{a},\alpha} \frac{1+n\hat{\sigma}^2(t)}{\sqrt{n}|\ln\hat{S}(t)|}\]</span> where</p>
+<p><span class="math display">\[\hat{a} = n{\sigma}^2(t_{(m)}) / \big[1+n{\sigma}^2(t)\big]\]</span>,</p>
+<p><span class="math display">\[\hat{\sigma}^2(t) = \sum\limits_{t_{(1)} \leq t} \frac{d_i}{n_i(n_i-d_1)}\]</span></p>
+<p>and <span class="math inline">\(H_{\hat{a},\alpha}\)</span> is a percentile of the following table:</p>
+<pre class="r"><code>hw_table &lt;- data.frame(&quot;1-a&quot;=c(0.9, 0.95, 0.99),
+                       &quot;0.1&quot;=c(0.599, 0.682, 0.851))
+
+hw_table</code></pre>
+<pre><code>##   X1.a  X0.1
+## 1 0.90 0.599
+## 2 0.95 0.682
+## 3 0.99 0.851</code></pre>
+<ul>
+<li>Denote the lower and upper endpoints of this interval as <span class="math inline">\(\hat{b}_l\)</span> and <span class="math inline">\(\hat{b}_u\)</span>, respectively. The endpoints of the survival function are:</li>
+</ul>
+<p><span class="math display">\[\Big(\exp\big[-\exp(\hat{b}_u)\big], \exp\big[-\exp(\hat{b}_l)\big]\Big)\]</span></p>
+<ul>
+<li>With this confidence band estimate, we can say with a <span class="math inline">\(95\%\)</span> probability that the band will include its parameter.</li>
+</ul>
+</div>
 </div>
 </div>
 

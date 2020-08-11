@@ -2,7 +2,9 @@
 title: "Chapter 2 - Exercises"
 author: "Héctor Lira Talancón"
 date: "4/4/2020"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -60,7 +62,7 @@ $$\hat{\text{Var}}\Big[\ln\{-\ln \hat{S}(t)\}\Big] = \frac{1}{\big[\ln \hat{S}(t
 $$\ln\{-\ln \hat{S}(t)\} \pm z_{1-\alpha/2} \hat{\text{SE}}\big[\ln\{-\ln \hat{S}(t)\}\big]$$
 where $z_{1-\alpha/2}$ is the $\alpha/2$ percentile of a standard normal distribution and $\hat{\text{SE}}(\cdot)$ is the estimated standard error of $(\cdot)$, in this case, the estimated variance of the _log-log_ survival function.
 
-- If we let $\hat{c}_l$ and $\hat{c}_u$ denote the lower and upper limits of the interval mentioned above, it follows that the condfidence interval for the survival function is given by:
+- If we let $\hat{c}_l$ and $\hat{c}_u$ denote the lower and upper limits of the interval mentioned above, it follows that the confidence interval for the survival function is given by:
 
 $$\big(\exp\big[-\exp(\hat{c}_u)\big], \exp\big[-\exp(\hat{c}_l)\big]\big)$$
 
@@ -68,4 +70,33 @@ Note how the endpoints are inverted.
 
 - It has been observed that this estimation performs well with sample sizes as small as 25 observations and with up to $50\%$ right-censored observations.
 - Other confidence interval estimations include different transformations: (already studied) log transformation, $\ln\hat{S}(t)$, the logit transformation, $\ln{\hat{S}(t) / \big[1-\hat{S}(t)\big]}$, and the arcsine transformation, $\arcsin \sqrt{\hat{S}(t)}$.
+- There is little practical differences from using a different transformation, except that the the arcsine transformation gets wider faster than the other ones for small size samples.
 
+### Confidence Interval Bands
+
+- Using the confidence interval estimations we can compute confidence interval bands.
+- However, the probability that all of the confidence intervals contain their respective parameter is much less than $(1-\alpha/2)$.
+- Hall and Wellner suggest the following formula to compute interval bands for the interval $(0, t_{(m)})$ where $t_{(m)}$ is the largest non-censored value of time:
+
+$$\ln\big[-\ln\hat{S}(t)\big] \pm H_{\hat{a},\alpha} \frac{1+n\hat{\sigma}^2(t)}{\sqrt{n}|\ln\hat{S}(t)|}$$
+where
+
+$$\hat{a} = n{\sigma}^2(t_{(m)}) / \big[1+n{\sigma}^2(t)\big]$$,
+
+$$\hat{\sigma}^2(t) = \sum\limits_{t_{(1)} \leq t} \frac{d_i}{n_i(n_i-d_1)}$$
+
+and $H_{\hat{a},\alpha}$ is a percentile of the following table:
+
+```{r hall_wellner_table}
+hw_table <- data.frame("1-a"=c(0.9, 0.95, 0.99),
+                       "0.1"=c(0.599, 0.682, 0.851))
+
+hw_table
+```
+
+
+- Denote the lower and upper endpoints of this interval as $\hat{b}_l$ and $\hat{b}_u$, respectively. The endpoints of the survival function are:
+
+$$\Big(\exp\big[-\exp(\hat{b}_u)\big], \exp\big[-\exp(\hat{b}_l)\big]\Big)$$
+
+- With this confidence band estimate, we can say with a $95\%$ probability that the band will include its parameter.
