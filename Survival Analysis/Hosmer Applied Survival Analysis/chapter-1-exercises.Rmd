@@ -79,8 +79,7 @@ Follow-up dates may be right censored.
 Event: drop-out of the study.
 
 Right censored observations include:
-- 
-- patients that could not be contacted anymore (e.g. they moved cities)
+- patients that could not be contacted anymore (e.g. they moved cities).
 
 Left censored observations include:
 - 
